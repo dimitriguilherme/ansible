@@ -1,0 +1,45 @@
+---
+- name: install node e npm
+  hosts: all
+  tasks:
+    - name: Atualiza repo e cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: instala nodejs npm
+      apt:
+        pkg:
+          - nodejs
+          - npm
+
+- name: deployy 
+  hosts: all
+  tasks:
+    - name: copia node
+      unarchive:
+        src: /media/vader/storage/mydocuments/dimitri/lab/ansible/app.tgz
+        dest: /root/
+    # - name: copia pack
+    #   copy:
+    #     src: /media/vader/storage/mydocuments/dimitri/lab/ansible/app/package.json
+    #     dest: /root/app/package/
+    - name: install deps
+      npm:
+        path: /root/package/app/package
+    - name: start app
+      command: 
+        chdir: /root/app
+        cmd: node /root/package/app/server.js
+
+
+
+
+
+###############        
+    #   copy:
+    #     src: /media/vader/storage/mydocuments/dimitri/lab/ansible/app/app.tgz
+    #     dest: /root/app.tgz
+    # - name: unpack
+    #   unarchive:
+    #     src: /root/app.tgz
+    #     dest: /root/
+    #     remote_src: yes
+

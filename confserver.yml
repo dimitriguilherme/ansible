@@ -1,0 +1,40 @@
+---
+    - name: Config sudo
+      hosts: all
+      tasks:
+      - name: install sudo
+        apt:
+          name: sudo
+          state: latest
+        register: aptout
+      # - debug: msg="{{ aptout.stdout_lines }}"
+      
+    - name: Create new linux user for node app
+      hosts: all
+      vars_files:
+        - var
+      tasks:
+        - name: Create linux user
+          user:
+            name: "{{username}}"
+            comment: Node User
+            group: admin
+        #   register: user_creation_result
+        # - debug: msg={{user_creation_result}}
+
+    - name: copy file
+      hosts: all
+      become: True
+      vars_files:
+        - var
+      become_user: "{{username}}"
+      tasks:
+        - name: copiando
+          copy:
+            src: /media/vader/storage/mydocuments/dimitri/lab/ansible/app.tgz
+            dest: "{{destt}}"
+         #   dest: "{{destination}}""
+
+
+
+# apt-get remove sudo -y ; deluser antoine ; rm -rf /home/antoine/

@@ -1,0 +1,6 @@
+version: 1.0.0 
+location: /home/vader/mydocuments/dimitri/lab/ansible/node2/node-app
+linux_name: asd
+user_home_dir: /home/{{linux_name}}
+
+docker_password: xxxxx

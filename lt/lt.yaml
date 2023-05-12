@@ -1,0 +1,34 @@
+# apt remove nginx nginx-common nginx-core -y
+
+- hosts: web
+  become: yes
+  remote_user: root
+  tasks:
+  - name: Instalando o nginx
+    apt:
+      name: nginx
+      state: latest
+      update_cache: yes
+  - name: Instalando o cmatrix
+    apt:
+      name: cmatrix
+      state: absent
+      update_cache: yes
+  - name: Iniciando o nginx
+    service:
+      name: nginx
+      state: started
+  - name: Copiando index.html personalizado
+    template:
+      src: index.html.j2
+      dest: /var/www/html/index.html
+  # - name: Copiando nginx.conf
+  #   copy:
+  #     src: nginx.conf
+  #     dest: /etc/nginx/nginx.conf
+    notify: Restartando o Nginx
+  handlers:
+  - name: Restartando o Nginx
+    service:
+      name: nginx
+      state: restarted

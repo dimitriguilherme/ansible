@@ -1,0 +1,83 @@
+---
+- name: install docker
+  hosts: docker
+  become: yes
+  tasks:
+    - name: Install apt-transport-https
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - lsb-release
+          - gnupg
+        state: latest
+        update_cache: true
+
+    - name: Add signing key
+      ansible.builtin.apt_key:
+        url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+        state: present
+
+    - name: Add repository into sources list
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker
+          - docker.io
+          - docker-compose
+          - docker-registry
+          - docker-compose
+        state: latest
+        update_cache: true
+
+
+- name: Create new linux user for node app
+  hosts: docker
+  tasks:
+    - name: Create linux user
+      user:
+        name: antoine
+        comment: Node User
+        group: admin
+
+- name: permission to user
+  hosts: docker
+  become: yes
+  tasks:
+    - name: add user $name to group
+      user:
+        name: vader
+        groups: docker
+        append: yes
+
+
+- name: test docker
+  hosts: docker
+  tasks:
+    - name: pull
+      command: docker pull alpine
+
+
+- name: Start docker containers
+  hosts: docker
+  vars_prompt:
+    - name: docker_password
+      promt: enter pass
+  tasks:
+    - name: Copy docker compose
+      ansible.builtin.copy:
+        src: /home/vader/mydocuments/dimitri/lab/docker-compose/docker-compose1.yml 
+        dest: /home/vader/docker-compose.yaml
+    # - name: Docker login
+      # docker_login: 
+      #   registry_url: https://index.docker.io/v1/
+      #   username: dimitatu
+      #   password: "{{docker_password}}"
+    - name: Start container from compose
+      docker_compose: 
+        project_src: /home/vader   

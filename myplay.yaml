@@ -1,0 +1,14 @@
+---
+- name: Config nggixn
+  hosts: all
+  tasks:
+  - name: install nginx and start
+    apt:
+      name: nginx
+      # state: latest
+      state: absent
+  - name: start nginxs
+    service:
+      name: nginx
+      # state: started
+      state: stopped
